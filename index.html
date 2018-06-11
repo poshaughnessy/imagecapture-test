@@ -4,22 +4,83 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ImageCapture API test</title>
+    <style>
+      body { padding: 10px; }
+      button { font-size: 1.5em; padding: 5px; }
+      .hidden { display: none; }
+    </style>
   </head>
   <body>
+
+    <img id="img" width="300" height="200" class="hidden"/>
+
     <button id="take-photo">Take Photo</button>
+
+    <p>Based on this demo: <a href="https://simpl.info/imagecapture/">https://simpl.info/imagecapture/</a></p>
+    
     <script type="text/javascript">
+
       var btnTakePhoto = document.getElementById('take-photo');
-      btnTakePhoto.addEventListener('click', function() {
-        if (typeof ImageCapture !== 'undefined') {
-          ImageCapture.takePhoto({
-              fillLightMode: 'flash',
-              imageHeight: 300,
-              imageWidth: 200
-            });
-        } else {
-          console.error('ImageCapture API not supported :(');          
-        }
-      });
+      var img = document.getElementById('img');
+      var mediaStream,
+          imageCapture;
+
+      function takePhoto() {
+
+        imageCapture.takePhoto({
+            //redEyeReduction: 'never',
+            imageHeight: 300,
+            imageWidth: 200
+          })
+          .then(blob => {
+            alert('Took photo: ' + blob);
+            img.classList.remove('hidden');
+            img.src = URL.createObjectURL(blob);
+          })
+          .catch(err => {
+            alert('takePhoto() error: ' + err);
+          });
+
+      }
+
+      function getCapabilities() {
+        
+        imageCapture.getPhotoCapabilities().then(function(capabilities) {
+          alert('Camera capabilities:', capabilities);          
+        }).catch(function(error) {
+          alert('getCapabilities() error: ' + error);
+        });
+
+      }
+
+      if (typeof ImageCapture !== 'undefined') {
+
+        navigator.mediaDevices.enumerateDevices()
+          .then((deviceInfos) => {
+            // Got devices - not currently using
+          })
+          .catch(error => {
+            alert('enumerateDevices() error: ' + error);
+          })
+          .then(() => {
+            // Get stream
+            navigator.mediaDevices.getUserMedia({video: true})
+              .then(stream => {
+                // Got stream
+                mediaStream = stream;
+                imageCapture = new ImageCapture(stream.getVideoTracks()[0]);
+                getCapabilities();               
+              })
+              .catch(error => {
+                alert('getUserMedia error: ' + error);
+              });
+          });
+
+          btnTakePhoto.addEventListener('click', takePhoto);
+
+      } else {
+          alert('ImageCapture API not supported :(');          
+      }
     </script>
   </body>
 </html>
