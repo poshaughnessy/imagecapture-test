@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale="1">
+    <title>ImageCapture API test</title>
+  </head>
+  <body>
+    <button id="take-photo">Take Photo</button>
+    <script type="text/javascript">
+      var btnTakePhoto = document.getElementById('take-photo');
+      btnTakePhoto.addEventListener('click', function() {
+        if (ImageCapture) {
+          ImageCapture.takePhoto({
+              fillLightMode: 'flash',
+              imageHeight: 300,
+              imageWidth: 200
+            });
+        } else {
+          console.error('ImageCapture API not supported :(');          
+        }
+      });
+    </script>
+  </body>
+</html>
+    
+    
